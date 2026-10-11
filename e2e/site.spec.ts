@@ -56,6 +56,28 @@ test('header anchors lead to existing sections and the sources page', async ({ p
   expect(await page.evaluate(() => getComputedStyle(document.getElementById('faq')!).scrollMarginTop)).not.toBe('0px')
 })
 
+test('browser entry stays visible outside the mobile menu and separate from the APK', async ({ page }, testInfo) => {
+  await page.goto(origin)
+  const login = page.locator('.header-login')
+  const browser = page.locator('.hero-actions > a').first()
+  const appUrl = process.env.FLEXA_APP_URL?.trim()
+  await expect(login).toBeInViewport()
+  await expect(page.locator('#site-menu .header-login')).toHaveCount(0)
+  if (appUrl) {
+    await expect(login).toHaveText('Zaloguj się')
+    await expect(login).toHaveAttribute('href', `${new URL(appUrl).origin}/login`)
+    await expect(browser).toContainText('Otwórz w przeglądarce')
+    await expect(browser).toHaveAttribute('href', new URL(appUrl).origin)
+  } else {
+    await expect(login).toHaveText('Otwórz demo')
+    await expect(login).toHaveAttribute('href', 'app/#/demo')
+    await expect(browser).toHaveAttribute('href', 'app/#/demo')
+  }
+  await expect(page.locator('#android').getByRole('link', { name: /Pobierz Flexa \(\.apk\)/ })).toHaveAttribute('href', APK)
+  await expect(page.locator('.hero-note')).toContainText('bez pobierania')
+  await page.screenshot({ path: testInfo.outputPath('web-entry.png') })
+})
+
 test.describe('on a phone', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
@@ -70,7 +92,7 @@ test.describe('on a phone', () => {
     await page.keyboard.press('Enter')
     await expect(toggle).toHaveAttribute('aria-expanded', 'true')
     await expect(faqLink).toBeVisible()
-    await expect(page.locator('#site-menu .header-actions .button:not([hidden])').first()).toBeVisible()
+    await expect(page.locator('.header-login')).toBeVisible()
     await page.keyboard.press('Tab')
     await expect(page.locator('#site-menu a').first()).toBeFocused()
     await page.keyboard.press('Escape')
@@ -108,6 +130,9 @@ test('the landing has no horizontal overflow at 320, 390 and 1440 px and passes 
     await page.setViewportSize({ width, height: 900 })
     await page.goto(origin)
     await expect(page.getByRole('heading', { name: /Jedzenie.*Ruch.*Twój rytm/ })).toBeVisible()
+    await expect(page.locator('.header-login')).toBeInViewport()
+    await expect(page.locator('.hero-actions > a').first()).toBeVisible()
+    await expect(page.locator('.hero-note')).toContainText('bez pobierania')
     await noOverflow(page)
     await openMenuIfCollapsed(page)
     await noOverflow(page)
@@ -120,7 +145,7 @@ test('the landing has no horizontal overflow at 320, 390 and 1440 px and passes 
 test('FAQ uses native disclosures with the promised questions', async ({ page }) => {
   await page.goto(`${origin}/#faq`)
   await expect(page.getByRole('heading', { name: 'Pytania.', level: 2 })).toBeVisible()
-  const questions = ['Czy Flexa jest darmowa?', 'Gdzie są moje dane?', 'Czy muszę zakładać konto?', 'Czy jest aplikacja na telefon?', 'Czego Flexa nie robi?', 'Skąd są dane produktów?']
+  const questions = ['Czy Flexa jest darmowa?', 'Czy mogę korzystać bez instalowania?', 'Gdzie są moje dane?', 'Czy muszę zakładać konto?', 'Czy jest aplikacja na telefon?', 'Czego Flexa nie robi?', 'Skąd są dane produktów?']
   await expect(page.locator('#faq details > summary')).toHaveText(questions)
   const data = page.locator('#faq details').filter({ hasText: 'Gdzie są moje dane?' })
   await expect(data).not.toHaveAttribute('open')

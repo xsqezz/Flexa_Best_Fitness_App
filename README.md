@@ -4,9 +4,13 @@ Darmowy, polski dziennik jedzenia, treningów i postępów. Niezależny projekt
 inspirowany funkcjonalnie Fitatu i Stravą — bez kopiowania ich kodu czy baz.
 Domena: [flexa.best](https://flexa.best/) (landing, GitHub Pages) i [app.flexa.best](https://app.flexa.best/) (aplikacja, Cloudflare Pages). Starsze adresy (`flexa-click.pages.dev`, `xsqezz.github.io/flexa.click`) nadal działają.
 
-Aplikacja z kontami: [Flexa](https://app.flexa.best/),
+Aplikacja w przeglądarce, bez instalowania APK: [Flexa](https://app.flexa.best/),
+[logowanie](https://app.flexa.best/login),
 [rejestracja](https://app.flexa.best/signup). Korzysta z osobnego projektu
 Supabase w regionie Frankfurt i z poczty weryfikacyjnej Brevo.
+Strona `flexa.best` ma widoczny link „Zaloguj się” w nagłówku (także na telefonie)
+oraz przycisk „Otwórz w przeglądarce”. Linki buduje `FLEXA_APP_URL`; bez tej
+konfiguracji wskazują lokalne demo lub instrukcję, nie nieistniejące logowanie.
 
 Publikacja GitHub Pages: [Flexa](https://xsqezz.github.io/flexa.click/),
 [pełne demo aplikacji](https://xsqezz.github.io/flexa.click/app/#/demo).

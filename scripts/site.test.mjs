@@ -1,11 +1,51 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
+import { execFileSync } from 'node:child_process'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { encodeQr, qrSvg } from './lib/qr.mjs'
 import { canonicalBase, DEFAULT_SITE_BASE, robotsTxt, sitemapXml, softwareJsonLd } from './lib/site-meta.mjs'
 
 const zxing = createRequire(import.meta.url)('@zxing/library')
 const APK = 'https://github.com/xsqezz/flexa.click/releases/latest/download/flexa.apk'
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+
+test('landing builds explicit browser and login links, with honest demo and setup fallbacks', () => {
+  const workspace = mkdtempSync(join(tmpdir(), 'flexa-site-links-'))
+  try {
+    cpSync(join(root, 'site'), join(workspace, 'site'), { recursive: true })
+    mkdirSync(join(workspace, 'app', 'dist-pages'), { recursive: true })
+    writeFileSync(join(workspace, 'app', 'dist-pages', 'index.html'), '<!doctype html><title>Demo</title>')
+    const build = (appUrl, withDemo) => {
+      execFileSync(process.execPath, [join(root, 'scripts', 'build-site.mjs'), ...(withDemo ? ['--with-demo'] : [])], {
+        cwd: workspace,
+        env: { ...process.env, FLEXA_APP_URL: appUrl, FLEXA_SITE_DOMAIN: '', FLEXA_ANDROID_URL: APK },
+        stdio: 'pipe',
+      })
+      return readFileSync(join(workspace, 'dist-site', 'index.html'), 'utf8')
+    }
+    const configured = build('https://app.flexa.best', true)
+    assert.match(configured, /class="button button-small header-login" href="https:\/\/app\.flexa\.best\/login">Zaloguj się<\/a>/)
+    assert.match(configured, /class="hero-actions"><a class="button" href="https:\/\/app\.flexa\.best">Otwórz w przeglądarce/)
+    assert.match(configured, /class="secondary-link" href="app\/#\/demo"/)
+    assert.match(configured, /bez pobierania\. Darmowe konto/)
+    assert.ok(!configured.includes('{{'))
+
+    const demo = build('', true)
+    assert.match(demo, /header-login" href="app\/#\/demo">Otwórz demo<\/a>/)
+    assert.match(demo, /Demo działa lokalnie, bez konta i synchronizacji/)
+    assert.ok(!demo.includes('>Zaloguj się</a>'))
+
+    const setup = build('', false)
+    assert.match(setup, /header-login" href="setup\.html">Uruchom Flexa<\/a>/)
+    assert.ok(!setup.includes('>Zaloguj się</a>'))
+  } finally {
+    rmSync(workspace, { recursive: true, force: true })
+  }
+})
 
 function decode({ size, modules }) {
   const scale = 4

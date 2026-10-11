@@ -28,9 +28,12 @@ const description = 'Flexa łączy jedzenie, treningi i postępy w jednym darmow
 const replacements = {
   APP_URL: escape(app?.origin ?? (withDemo ? 'app/#/demo' : 'setup.html')),
   DEMO_URL: escape(withDemo ? 'app/#/demo' : app ? `${app.origin}/demo` : 'setup.html#demo'),
-  APP_CTA: app ? 'Otwórz aplikację' : withDemo ? 'Otwórz demo Flexa' : 'Jak uruchomić Flexa',
-  // The separate demo button would duplicate the main call to action when the main one already opens the demo.
-  DEMO_CTA_HIDDEN: !app && withDemo ? ' hidden' : '',
+  APP_CTA: app ? 'Otwórz w przeglądarce' : withDemo ? 'Otwórz demo Flexa' : 'Jak uruchomić Flexa',
+  LOGIN_URL: escape(app ? `${app.origin}/login` : withDemo ? 'app/#/demo' : 'setup.html'),
+  LOGIN_CTA: app ? 'Zaloguj się' : withDemo ? 'Otwórz demo' : 'Uruchom Flexa',
+  WEB_NOTE: app
+    ? 'Na telefonie i komputerze — bez pobierania. Darmowe konto i ten sam dziennik co w aplikacji na Androida.'
+    : 'Na telefonie i komputerze — bez pobierania. Demo działa lokalnie, bez konta i synchronizacji.',
   ANDROID_URL: escape(androidUrl.href),
   ANDROID_QR: qrSvg(androidUrl.href, { label: 'Kod QR z linkiem do pobrania Flexa na Androida (.apk)', id: 'android-qr-title' }),
   SITE_BASE: escape(base),
