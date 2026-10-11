@@ -51,7 +51,7 @@ export function QuickAdd({ date, onClose }: { date: string; onClose: () => void 
       </button></li>
       <li><button type="button" onClick={() => then(() => workspace.openMeal(meal, 'barcode'))}>
         <span className="quick-add-icon"><ScanBarcode size={20} aria-hidden="true" /></span>
-        <span><strong>Skanuj kod kreskowy</strong><small>Aparat albo wpisany numer EAN</small></span>
+        <span><strong>Skanuj kod kreskowy</strong><small>Ocena produktu 1–100 · aparat albo EAN</small></span>
       </button></li>
       <li><button type="button" onClick={() => then(() => navigate('/meals/scan'))}>
         <span className="quick-add-icon"><Camera size={20} aria-hidden="true" /></span>

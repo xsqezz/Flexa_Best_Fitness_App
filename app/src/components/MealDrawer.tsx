@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { ArrowLeft, ChevronRight, Search, Utensils } from 'lucide-react'
-import { foodSchema, mealNames, mealSchema, type Food, type MealKind, type SearchResponse } from '../../../shared/domain'
+import { foodSchema, isValidBarcode, mealNames, mealSchema, sameBarcode, type Food, type MealKind, type SearchResponse } from '../../../shared/domain'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../lib/Auth'
 import { useJournal } from '../lib/Journal'
@@ -19,6 +19,7 @@ import type { MealTab } from './Workspace'
 import { LabelReader } from './LabelReader'
 import type { LabelReading } from '../lib/scan/label-client'
 import { kcalOnlyMeal } from '../lib/quick-kcal'
+import { ProductAssessment } from './ProductAssessment'
 
 const mealKinds: MealKind[] = ['breakfast', 'lunch', 'dinner', 'snack']
 const nutrientFields = [
@@ -37,6 +38,7 @@ export function MealDrawer({ date, initialMeal, initialTab = 'search', onClose }
   const [tab, setTab] = useState<MealTab>(initialTab)
   const [query, setQuery] = useState('')
   const [barcode, setBarcode] = useState('')
+  const [reviewBarcode, setReviewBarcode] = useState<string | null>(null)
   const [result, setResult] = useState<SearchResponse | null>(null)
   const [searching, setSearching] = useState(false)
   const [food, setFood] = useState<Food | null>(null)
@@ -59,6 +61,7 @@ export function MealDrawer({ date, initialMeal, initialTab = 'search', onClose }
   async function search(input: { query: string } | { barcode: string }) {
     const version = ++searchVersion.current
     setError(null); setSearching(true); setResult(null)
+    setReviewBarcode('barcode' in input && isValidBarcode(input.barcode) ? input.barcode : null)
     try {
       const response = await client.fetchQuery({
         queryKey: ['food-search', mode, auth.session?.user.id ?? 'demo', input, customFoods],
@@ -123,6 +126,7 @@ export function MealDrawer({ date, initialMeal, initialTab = 'search', onClose }
     {food ? <>
       <button className="text-link" onClick={() => { setFood(null); setError(null) }}><ArrowLeft size={16} aria-hidden="true" />Wybierz inny produkt</button>
       <div className="selected-food"><h3>{food.name}</h3><p>{food.brand || sourceNames[food.source]}</p></div>
+      {reviewBarcode && food.barcode && sameBarcode(reviewBarcode, food.barcode) && <ProductAssessment barcode={reviewBarcode} />}
       <form className="form-stack" onSubmit={(event) => { void add(event) }}>
         <Field label="Wartości na etykiecie dotyczą" hint="Dla płynów sprawdź, czy podano wartości na 100 ml. Nie zakładamy, że 1 ml waży 1 g.">
           <select value={unit} required onChange={(event) => {
@@ -144,10 +148,10 @@ export function MealDrawer({ date, initialMeal, initialTab = 'search', onClose }
       </form><SourceCredit food={food} />
     </> : <>
       <div className="segmented-control" aria-label="Sposób dodania produktu">
-        <button aria-pressed={tab === 'search'} onClick={() => { setTab('search'); setResult(null); setError(null) }}>Wyszukaj</button>
-        <button aria-pressed={tab === 'barcode'} onClick={() => { setTab('barcode'); setResult(null); setError(null) }}>Kod kreskowy</button>
-        <button aria-pressed={tab === 'custom'} onClick={() => { setTab('custom'); setResult(null); setError(null) }}>Własny produkt</button>
-                <button aria-pressed={tab === 'kcal'} onClick={() => { setTab('kcal'); setResult(null); setError(null) }}>Same kcal</button>
+        <button aria-pressed={tab === 'search'} onClick={() => { setTab('search'); setResult(null); setReviewBarcode(null); setError(null) }}>Wyszukaj</button>
+        <button aria-pressed={tab === 'barcode'} onClick={() => { setTab('barcode'); setResult(null); setReviewBarcode(null); setError(null) }}>Kod kreskowy</button>
+        <button aria-pressed={tab === 'custom'} onClick={() => { setTab('custom'); setResult(null); setReviewBarcode(null); setError(null) }}>Własny produkt</button>
+                <button aria-pressed={tab === 'kcal'} onClick={() => { setTab('kcal'); setResult(null); setReviewBarcode(null); setError(null) }}>Same kcal</button>
               </div>
               {tab === 'kcal' ? <form className="form-stack" onSubmit={(event) => { void saveKcal(event) }}>
                 <p className="source-credit">Znasz tylko kalorie, np. z menu restauracji lub aplikacji sieci? Wpisz je bez szukania produktu. Makroskładniki są opcjonalne; puste oznaczają „nieznane”, nie zero.</p>
@@ -188,7 +192,7 @@ export function MealDrawer({ date, initialMeal, initialTab = 'search', onClose }
           </select>
         </Field>}
         {tab === 'barcode' && <><CameraScanner onDetected={(value) => { setBarcode(value); void search({ barcode: value }) }} />
-          <p className="source-credit">Kod sprawdzamy w prawdziwym katalogu Open Food Facts, także bez konta. Wymagane jest połączenie z internetem.</p></>}
+          <p className="source-credit">Zeskanuj lub wpisz kod, aby zobaczyć ocenę produktu 1–100 i sprawdzić skład. Działa także bez konta; wymaga internetu. Nic nie zapisujemy automatycznie.</p></>}
         <form className="search-form" onSubmit={(event) => {
           event.preventDefault()
           void search(tab === 'barcode' ? { barcode } : { query })
@@ -198,9 +202,14 @@ export function MealDrawer({ date, initialMeal, initialTab = 'search', onClose }
               value={tab === 'barcode' ? barcode : query}
               inputMode={tab === 'barcode' ? 'numeric' : 'search'}
               minLength={tab === 'barcode' ? 8 : 2} maxLength={tab === 'barcode' ? 14 : 80} required
-              onChange={(event) => tab === 'barcode' ? setBarcode(event.target.value) : setQuery(event.target.value)} />
+              onChange={(event) => {
+                if (tab === 'barcode') { setBarcode(event.target.value); setReviewBarcode(null) }
+                else setQuery(event.target.value)
+              }} />
           </label><Button type="submit" busy={searching}><Search size={17} aria-hidden="true" />Szukaj</Button>
         </form>
+        {tab === 'barcode' && reviewBarcode && <ProductAssessment key={reviewBarcode} barcode={reviewBarcode} searchError={error}
+          onRetry={() => { void search({ barcode: reviewBarcode }) }} />}
         {searching && <Notice>Wyszukuję produkty…</Notice>}
         {!result && !searching && tab === 'search' && <MealTemplates date={date} initialMeal={initialMeal} onAdded={onClose} />}
         {!result && tab === 'search' && <>

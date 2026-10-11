@@ -1306,3 +1306,28 @@ h2 { font-weight: 680; }
 .plan-more > summary { cursor: pointer; font-weight: 600; font-size: 1.05rem; }
 .plan-more > summary:focus-visible, .goals-more > summary:focus-visible { outline: 3px solid #336fac; outline-offset: 2px; }
 .plan-more[open] > summary, .goals-more[open] > summary { margin-bottom: 16px; }
+
+.product-assessment { margin: 18px 0; padding-block: 18px; border-block: 1px solid var(--line); }
+.assessment-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.assessment-heading > div:first-child { min-width: 0; overflow-wrap: anywhere; }
+.assessment-heading h3 { margin: 0; }
+.assessment-heading .source-credit { margin-top: 4px; }
+.assessment-score { flex: none; display: flex; align-items: baseline; gap: 5px; padding: 10px 14px; border-radius: 20px; background: #edf0ee; color: var(--text); }
+.assessment-score strong { font-size: 1.85rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.assessment-score span { font-size: .8rem; }
+.assessment-a .assessment-score, .assessment-b .assessment-score { background: #d6f3e4; color: #1d4933; }
+.assessment-d .assessment-score, .assessment-e .assessment-score { background: #fff0bd; color: #6e4b18; }
+.assessment-no-score { flex: none; font-size: .85rem; }
+.assessment-verdict { margin-top: 12px; font-size: .95rem; font-weight: 650; }
+.product-assessment .source-credit { margin-top: 8px; }
+.assessment-caution { margin-top: 12px; font-size: .8rem; line-height: 1.65; color: var(--text); }
+.assessment-details { margin-top: 12px; }
+.assessment-details > summary { cursor: pointer; min-height: 44px; padding-block: 12px; font-size: .85rem; font-weight: 600; }
+.assessment-details h4 { margin: 18px 0 8px; font-size: .85rem; }
+.assessment-details p { font-size: .8rem; line-height: 1.65; }
+.assessment-factors { list-style: none; padding: 0; margin: 0; }
+.assessment-factors li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-block: 8px; border-bottom: 1px solid var(--line); font-size: .8rem; }
+.assessment-factors small { display: block; margin-top: 3px; }
+.assessment-factors strong { flex: none; font-variant-numeric: tabular-nums; }
+.assessment-ingredients { overflow-wrap: anywhere; }
+.assessment-status { padding-block: 12px; font-size: .85rem; }

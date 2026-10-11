@@ -5,6 +5,40 @@ import { mockEmptyCatalog } from './catalog-fixture'
 
 test.beforeEach(async ({ page }) => { await mockEmptyCatalog(page) })
 
+test('signed-in barcode assessment works for a private saved product without sharing account data', async ({ page }) => {
+  const mocked = await fixture(page)
+  const code = '4006381333931'
+  mocked.rows.custom_foods.push({ id: randomUUID(), user_id: userId, food: {
+    id: 'private-water', name: 'Moja zapisana woda', brand: '', barcode: code, source: 'custom', unit: 'ml',
+    nutrients: { kcal: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+  } })
+  const publicRequests: Record<string, string>[] = []
+  await page.route('https://world.openfoodfacts.org/**', (route) => {
+    publicRequests.push(route.request().headers())
+    return route.fulfill({ json: { product: {
+      code, product_name_pl: 'Woda mineralna', nutriscore: { '2023': {
+        grade: 'a', score: 0, nutriscore_computed: 1, nutriscore_applicable: 1, nutrients_available: 1, category_available: 1,
+        preparation: 'as_sold', data: {
+          is_beverage: 1, is_water: 1, is_fat_oil_nuts_seeds: 0, negative_points: 0, positive_points: 0,
+          components: { negative: [], positive: [] },
+        },
+      } },
+    } } })
+  })
+  await login(page)
+  await expect(page.getByRole('heading', { name: 'Cele', exact: true, level: 1 })).toBeVisible()
+  await page.getByRole('button', { name: 'Dodaj', exact: true }).first().click()
+  await page.getByRole('dialog', { name: 'Dodaj' }).getByRole('button', { name: /^Skanuj kod kreskowy/ }).click()
+  await page.getByRole('dialog').getByLabel('Kod EAN lub UPC').fill(code)
+  await page.getByRole('dialog').getByRole('button', { name: 'Szukaj', exact: true }).click()
+  await expect(page.getByRole('dialog').getByLabel('Ocena Flexa: 100 na 100')).toBeVisible()
+  await expect(page.getByRole('dialog').getByRole('button', { name: /Moja zapisana woda/ })).toBeVisible()
+  expect(publicRequests).toHaveLength(1)
+  expect(publicRequests[0].authorization).toBeUndefined()
+  expect(publicRequests[0].apikey).toBeUndefined()
+  expect(mocked.rows.meal_entries).toHaveLength(0)
+})
+
 const userId = '33333333-3333-4333-8333-333333333333'
 const user = {
   id: userId, email: 'test@example.invalid', aud: 'authenticated', role: 'authenticated',

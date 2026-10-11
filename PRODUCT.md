@@ -57,6 +57,11 @@ account; it is never presented as synchronized cloud data.
   estimate, and the feature works without AI in the local demo.
 - Open Food Facts is the primary packaged-food source; USDA FoodData Central
   is an optional fallback. Missing nutrient values are not invented.
+- Barcode scans also display a transparent nutritional-profile score from 1 to 100,
+  converted from an available, internally consistent Nutri-Score 2023 record in OFF.
+  This is Flexa's display scale, not a medical or food-safety rating and not another
+  app's algorithm. Ingredient and allergen information is separate. Missing data
+  means no rating; the lookup never logs food or sends account credentials.
 - "Odczyt etykiety" (custom product tab, signed-in only) copies the per-100 figures from a photo
   of a nutrition table into the form; the user checks and saves. Shares the daily vision budget.
 - "Same kcal" (tab in the add-meal drawer) stores a meal known only by its calories;

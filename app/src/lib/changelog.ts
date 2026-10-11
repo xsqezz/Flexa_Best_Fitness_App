@@ -4,6 +4,14 @@ export type ChangelogEntry = { date: string; title: string; points: string[] }
 export const changelog: ChangelogEntry[] = [
   {
     date: '2026-10-11',
+    title: 'Ocena produktu po kodzie',
+    points: [
+      'Zeskanuj lub wpisz kod kreskowy, aby zobaczyć ocenę profilu odżywczego 1–100, skład i alergeny — bez dodawania posiłku.',
+      'Ocena jest jawnym przeliczeniem aktualnego Nutri-Score z Open Food Facts. Przy brakujących danych nie zgadujemy wyniku.',
+    ],
+  },
+  {
+    date: '2026-10-11',
     title: 'Prostszy układ zakładek',
     points: [
       'Wszystkie zakładki zostały, ale mają mniej przycisków: dodawanie jest w jednym miejscu — przycisku „Dodaj” — a nie w każdej zakładce osobno.',

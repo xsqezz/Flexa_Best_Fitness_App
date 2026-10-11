@@ -53,6 +53,35 @@ describe('real public food catalog', () => {
     await searchPublicFoods({ barcode })
     expect(fetch).toHaveBeenCalledOnce()
   })
+  it('shares the assessment request with barcode search and asks for current scoring metadata', async () => {
+    const { getPublicProduct, searchPublicFoods } = await import('./public-food')
+    const [raw, foods] = await Promise.all([
+      getPublicProduct(barcode), searchPublicFoods({ barcode: `0${barcode}` }),
+    ])
+    expect(raw).toMatchObject({ code: barcode })
+    expect(foods.foods[0].barcode).toBe(barcode)
+    expect(fetch).toHaveBeenCalledOnce()
+    const url = new URL(String(vi.mocked(fetch).mock.calls[0][0]))
+    expect(url.searchParams.get('fields')).toContain('nutriscore')
+    expect(url.searchParams.get('fields')).toContain('allergens_tags')
+    expect(url.searchParams.get('fields')).toContain('ingredients_text_pl')
+  })
+  it('does not turn a provider error into a cached missing assessment and permits retry', async () => {
+    const { getPublicProduct } = await import('./public-food')
+    vi.mocked(fetch).mockResolvedValueOnce(response({}, 503))
+    await expect(getPublicProduct(barcode)).rejects.toThrow('niedostępna')
+    await expect(getPublicProduct(barcode)).resolves.toMatchObject({ code: barcode })
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
+  it('caches a genuinely absent assessment and validates barcode before lookup', async () => {
+    const { getPublicProduct } = await import('./public-food')
+    vi.mocked(fetch).mockResolvedValue(response({}, 404))
+    await expect(getPublicProduct(barcode)).resolves.toBeNull()
+    await expect(getPublicProduct(`0${barcode}`)).resolves.toBeNull()
+    expect(fetch).toHaveBeenCalledOnce()
+    await expect(getPublicProduct('4025500132478')).rejects.toThrow()
+    expect(fetch).toHaveBeenCalledOnce()
+  })
   it('keeps private barcode products available without a network request', async () => {
     const own: Food = {
       id: 'private', name: 'Własny napój', brand: '', barcode, source: 'custom',

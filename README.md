@@ -29,6 +29,36 @@ BarcodeDetector/ZXing, treningi, import własnych GPX/TCX, tempo i minuty × RPE
 analizy 7/30/90 dni, pomiary, eksport JSON, usunięcie konta i synchronizacja.
 Oddzielne demo zapisuje wyłącznie przykładowe dane na urządzeniu.
 
+**Ocena produktu po kodzie:** „Dodaj” → „Skanuj kod kreskowy” pokazuje ocenę
+profilu odżywczego 1–100, skład i alergeny. Kamera i ręczne wpisanie kodu uruchamiają
+tę samą ścieżkę; sprawdzenie nie dodaje posiłku. Działa w demo, wersji webowej
+i powłoce Androida, także dla kodów znalezionych w lokalnym katalogu lub własnych
+produktach. Publiczny odczyt OFF wysyła tylko kod, bez tokenu konta; cache i limit
+14 odczytów/min są wspólne z wyszukiwaniem po kodzie (`getPublicProduct`).
+
+Metoda `flexa-nutriscore-2023-v1` (`shared/product-assessment.ts`) przelicza
+**już obliczony Nutri-Score 2023 z Open Food Facts**, nie udaje własnej naukowo
+zweryfikowanej oceny zdrowia. Klasy A/B/C/D/E dostają odpowiednio zakresy
+81–100 / 61–80 / 41–60 / 21–40 / 1–20. W obrębie klasy:
+`round(maximum - (wynik_OFF - dolny_próg) / (górny_próg - dolny_próg) * (maximum - minimum))`.
+
+| Kategoria | A | B | C | D | E |
+|---|---|---|---|---|---|
+| Żywność ogólna | −17…0 | 1…2 | 3…10 | 11…18 | 19…55 |
+| Tłuszcze, oleje, orzechy, nasiona | −17…−6 | −5…2 | 3…10 | 11…18 | 19…55 |
+| Napoje poza wodą | niedostępne | −18…2 | 3…6 | 7…9 | 10…54 |
+
+Woda otrzymuje 100; nie oznacza to bezpieczeństwa dla każdego ani zalecanej porcji.
+To skala prezentacyjna Flexy, nie oficjalny procent Nutri-Score ani algorytm
+„Zdrowych Zakupów”. Progi klas opierają się na
+[regułach Nutri-Score 2023](https://www.santepubliquefrance.fr/nutri-score).
+Wynik wymaga wersji 2023, flag dostępności i zastosowalności, danych `as_sold`
+oraz zgodności klasy, wyniku i sum punktów składowych. Starsze, sprzeczne
+i niepełne rekordy mają **„Brak oceny”**. Awarie bazy są osobnym błędem z możliwością
+ponowienia. Skala nie ocenia toksyczności dodatków, pestycydów, alergenów ani
+indywidualnej diety. Wynik, lista składników i alergeny nie są zapisywane do
+dziennika; dodanie produktu pozostaje osobną czynnością.
+
 **Plan treningowy:** po założeniu konta ankieta „Zanim zaczniesz” pyta krok po
 kroku o wiek, płeć, cel, siłownię lub dom ze sprzętem, doświadczenie, dni
 i długość treningu oraz zdrowie. Zakładka Plan pokazuje tydzień z rozgrzewką,

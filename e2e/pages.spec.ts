@@ -124,5 +124,6 @@ test('all 150 required product positions are available from the built-in license
   await dialog.getByLabel('Kod EAN lub UPC', { exact: true }).fill('5449000054227')
   await dialog.getByRole('button', { name: 'Szukaj', exact: true }).click()
   await expect(dialog.locator('.food-result strong').first()).toContainText(/Coca/i)
-  expect(external).toBe(0)
+  await expect(dialog.getByText(/Nie udało się sprawdzić oceny/)).toBeVisible()
+  expect(external).toBe(1)
 })
