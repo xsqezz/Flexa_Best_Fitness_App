@@ -20,7 +20,7 @@ export async function searchFoods(
   try {
     const indexed = await findCatalogFoods(request)
     if (indexed.length) return { foods: [...local, ...indexed], warnings: [
-      'Katalog preferuje produkty z Polski; zawiera też wybrane warianty z innych rynków. Sprawdź dokładną markę, wariant i podstawę wartości na etykiecie.',
+      'Katalog zawiera produkty z oznaczeniem sprzedaży lub zakupu w Polsce w Open Food Facts, nie gwarantuje bieżącej dostępności w sklepach. Sprawdź markę, wariant i wartości na etykiecie.',
     ] }
   } catch (cause) {
     warnings.push(cause instanceof Error ? cause.message : 'Nie udało się odczytać polskiego katalogu.')

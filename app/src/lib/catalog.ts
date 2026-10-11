@@ -11,7 +11,8 @@ async function loadCatalog() {
       url.searchParams.set('v', import.meta.env.VITE_POLISH_CATALOG_HASH)
       const response = await fetch(url, { signal: AbortSignal.timeout(10_000) })
       if (!response.ok) throw new Error(`Nie udało się odczytać polskiego katalogu (${response.status}).`)
-      return catalogSchema.parse(await response.json())
+      const data = catalogSchema.parse(await response.json())
+      return { ...data, products: data.products.filter((record) => record.polishMarket) }
     })()
     catalog.catch(() => { catalog = null })
   }
