@@ -66,7 +66,7 @@ export function MealDrawer({ date, initialMeal, initialTab = 'search', onClose }
       const response = await client.fetchQuery({
         queryKey: ['food-search', mode, auth.session?.user.id ?? 'demo', input, customFoods],
         queryFn: () => searchFoods(input, mode, customFoods),
-        staleTime: 300_000, retry: false,
+        staleTime: 300_000, retry: false, networkMode: 'always',
       })
       if (version === searchVersion.current) setResult(response)
     } catch (cause) { if (version === searchVersion.current) setError(errorMessage(cause)) }

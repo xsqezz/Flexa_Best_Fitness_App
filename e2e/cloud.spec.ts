@@ -1,9 +1,34 @@
 import { randomUUID } from 'node:crypto'
 import { openAdd } from './add'
 import { test, expect, type Page } from '@playwright/test'
-import { mockEmptyCatalog } from './catalog-fixture'
+import { expandedCatalogExample, mockEmptyCatalog } from './catalog-fixture'
 
 test.beforeEach(async ({ page }) => { await mockEmptyCatalog(page) })
+
+test('signed-in search recognizes the expanded Polish catalogue by name and barcode without server fallback', async ({ page }) => {
+  const mocked = await fixture(page)
+  const { name } = expandedCatalogExample()
+  await page.unroute('**/data/polish-products.json*')
+  await page.route('https://world.openfoodfacts.org/**', (route) => route.fulfill({ status: 404, json: {} }))
+  await login(page)
+  await expect(page.getByRole('heading', { name: 'Cele', exact: true, level: 1 })).toBeVisible()
+  await openAdd(page, 'Posiłek')
+  const drawer = page.getByRole('dialog')
+  const foodResult = drawer.locator('.food-result').filter({ has: page.getByText(name, { exact: true }) })
+  await drawer.getByRole('textbox', { name: 'Nazwa produktu', exact: true }).fill(name)
+  await drawer.getByRole('button', { name: 'Szukaj', exact: true }).click()
+  await expect(foodResult).toBeVisible()
+  await expect(foodResult).toContainText('28 kcal')
+  await drawer.getByRole('button', { name: 'Kod kreskowy', exact: true }).click()
+  await drawer.getByLabel('Kod EAN lub UPC').fill('3083680592857')
+  await drawer.getByRole('button', { name: 'Szukaj', exact: true }).click()
+  await foodResult.click()
+  await drawer.getByLabel('Porcja (g)', { exact: true }).fill('200')
+  await drawer.getByRole('button', { name: 'Dodaj do dziennika' }).click()
+  expect(mocked.calls.filter((call) => call.path === '/functions/v1/food-search')).toHaveLength(0)
+  expect(mocked.rows.meal_entries).toHaveLength(1)
+  expect(mocked.rows.meal_entries[0]).toMatchObject({ portion: 200, food: { barcode: '3083680592857', nutrients: { kcal: 28 } } })
+})
 
 test('signed-in barcode assessment works for a private saved product without sharing account data', async ({ page }) => {
   const mocked = await fixture(page)

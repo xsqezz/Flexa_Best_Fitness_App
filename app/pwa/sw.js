@@ -79,7 +79,7 @@ self.addEventListener('fetch', (event) => {
   if (path.startsWith('api/') || path === 'sw.js') return
   if (request.mode === 'navigate') {
     event.respondWith(navigation(request))
-  } else if (path.startsWith('assets/')) {
+  } else if (path.startsWith('assets/') || (path === 'data/polish-products.json' && url.searchParams.has('v'))) {
     event.respondWith(cacheFirst(request))
   } else {
     event.respondWith(staleWhileRevalidate(request, event))

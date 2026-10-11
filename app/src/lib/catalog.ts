@@ -8,9 +8,11 @@ async function loadCatalog() {
   if (!catalog) {
     catalog = (async () => {
       const url = new URL(`${import.meta.env.BASE_URL}data/polish-products.json`, window.location.href)
+      url.searchParams.set('v', import.meta.env.VITE_POLISH_CATALOG_HASH)
       const response = await fetch(url, { signal: AbortSignal.timeout(10_000) })
       if (!response.ok) throw new Error(`Nie udało się odczytać polskiego katalogu (${response.status}).`)
-      return catalogSchema.parse(await response.json())
+      const data = catalogSchema.parse(await response.json())
+      return { ...data, products: data.products.filter((record) => record.polishMarket) }
     })()
     catalog.catch(() => { catalog = null })
   }

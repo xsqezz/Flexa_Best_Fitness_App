@@ -16,10 +16,13 @@ Publikacja GitHub Pages: [Flexa](https://xsqezz.github.io/flexa.click/),
 [pełne demo aplikacji](https://xsqezz.github.io/flexa.click/app/#/demo).
 Demo zapisuje zmiany lokalnie; nie tworzy kont ani synchronizacji.
 Skaner i wyszukiwanie także w tej wersji korzystają z prawdziwego katalogu
-Open Food Facts przez publiczne API, nie z kilkunastu przykładowych produktów.
+Open Food Facts, a poza lokalnym eksportem z publicznego API, nie z kilkunastu
+przykładowych produktów.
 Internet jest potrzebny do pobrania nowych produktów; własne produkty są lokalne.
-Katalog startowy obejmuje wszystkie 150 wymaganych typów produktów w sześciu
-kategoriach oraz tysiące rzeczywistych wariantów z kodami. Jest dostępny do
+Katalog obejmuje **32 987 unikalnych kodów produktów z oznaczeniem sprzedaży
+lub zakupu w Polsce** (eksport z 11 października 2026), w tym 24 579 z energią.
+Pokrywa 148 ze 150 wymaganych typów w sześciu kategoriach; braków nie
+uzupełnia losowymi produktami zagranicznymi. Jest dostępny do
 [pobrania na licencji ODbL](app/public/data/polish-products.json);
 [opis źródeł i aktualizacji](docs/CATALOG.md).
 

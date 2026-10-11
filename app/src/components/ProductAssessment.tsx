@@ -20,7 +20,7 @@ export function ProductAssessment({ barcode, searchError, onRetry }: { barcode: 
       const product = await getPublicProduct(barcode)
       return product ? assessProduct(product, barcode) : null
     },
-    staleTime: 300_000, retry: false,
+    staleTime: 300_000, retry: false, networkMode: 'always',
   })
   if (query.isPending) return <p className="assessment-status" role="status">Sprawdzam ocenę produktu…</p>
   if (query.isError) return <div className="assessment-unavailable">

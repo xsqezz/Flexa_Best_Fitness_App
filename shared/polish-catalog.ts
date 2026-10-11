@@ -1,4 +1,5 @@
 export type CatalogGroup = 'dairy' | 'meat' | 'grains' | 'snacks' | 'drinks' | 'pantry'
+export const polishPurchasePlaces = ['Polska', 'polska', 'Poland', 'poland', 'Poland - Polski', 'poland-polski'] as const
 type Definition = readonly [name: string, aliases: string, tags: string, qualifier?: string]
 export const catalogGroups: { id: CatalogGroup; name: string; entries: Definition[] }[] = [
   { id: 'dairy', name: 'Nabiał, jogurty i jajka', entries: [
