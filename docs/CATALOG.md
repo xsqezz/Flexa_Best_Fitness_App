@@ -64,6 +64,29 @@ energii można rozpoznać, ale przed wpisem do dziennika trzeba uzupełnić etyk
 Produkty spoza katalogu nadal korzystają z zapytania online. Własne produkty
 użytkownika mają pierwszeństwo i nie są publikowane.
 
+## Publikacja i cache
+
+Każdy build Vite liczy SHA-256 z rzeczywistej zawartości katalogu i wstawia go
+do adresu odczytu: `data/polish-products.json?v=<sha256>`. Dotyczy to wersji
+z kontami, demo, APK korzystającego ze strony oraz demo na GitHub Pages.
+Stara kopia pod adresem bez parametru albo z innym hashem nie pasuje do
+nowego żądania, nawet gdy stary service worker nadal kontroluje kartę.
+
+Service worker tej wersji zapisuje katalog pod tym samym wersjonowanym
+adresem podczas instalacji. Wersjonowane katalogi są odczytywane z cache
+powłoki również bez sieci, a zmiana katalogu zmienia wersję powłoki.
+Przy awarii pobierania nie podstawiamy starszej bazy jako aktualnej.
+Ocena profilu odżywczego nadal wymaga osobnego odczytu aktualnych danych
+Open Food Facts i nie jest liczona z niepełnych rekordów katalogu.
+
+Zmiany katalogu i kodu publikujemy przez PR do `main`. Cloudflare Pages buduje
+`npm run build` i publikuje `app/dist`; GitHub Pages buduje także demo.
+Nie jest potrzebna migracja Supabase ani nowe APK. Po publikacji sprawdź
+liczbę rekordów publicznego JSON, hash wersjonowanego adresu i odczyt znanego
+nowego kodu, np. `3083680592857` (Bonduelle; źródłowa nazwa „W?oszczyzna w paskach”).
+Ten konkretny zapis z pytajnikiem występuje już w zachowanym eksporcie OFF,
+nie powstał w importerze. Nazw ani kodów nie poprawiamy przez zgadywanie.
+
 Sprawdzono również [Datakick](https://gtinsearch.org/download) (6 561 rekordów,
 CC0) oraz [OpenNutrition](https://www.opennutrition.app/download) (326 759
 rekordów, z czego 313 442 z polem kodu). Ich eksporty nie mają pola kraju

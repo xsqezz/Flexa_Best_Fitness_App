@@ -4,6 +4,14 @@ export type ChangelogEntry = { date: string; title: string; points: string[] }
 export const changelog: ChangelogEntry[] = [
   {
     date: '2026-10-11',
+    title: 'Większy katalog produktów z Polski',
+    points: [
+      'Katalog zawiera teraz 32 987 produktów z kodami i źródłowym oznaczeniem polskiego rynku; 24 579 ma dane o energii.',
+      'Nowa wersja katalogu ma osobny adres, więc stara kopia z pamięci przeglądarki nie zasłania aktualizacji. Ocena produktów pozostaje dostępna.',
+    ],
+  },
+  {
+    date: '2026-10-11',
     title: 'Ocena produktu po kodzie',
     points: [
       'Zeskanuj lub wpisz kod kreskowy, aby zobaczyć ocenę profilu odżywczego 1–100, skład i alergeny — bez dodawania posiłku.',

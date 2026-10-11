@@ -30,6 +30,8 @@ describe('Polish market catalog lookup', () => {
     expect(await findCatalogFoods({ query: 'platki' })).toEqual([record.food])
     expect(fetch).toHaveBeenCalledOnce()
     expect(String(vi.mocked(fetch).mock.calls[0][0])).toContain('/data/polish-products.json')
+    const url = new URL(String(vi.mocked(fetch).mock.calls[0][0]))
+    expect(url.searchParams.get('v')).toBe('e'.repeat(64))
   })
   it('does not show foreign supplements from an older cached catalog', async () => {
     vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({

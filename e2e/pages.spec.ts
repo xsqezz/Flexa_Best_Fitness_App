@@ -106,7 +106,7 @@ test('public catalog failure is not mislabeled as a missing barcode', async ({ p
   await expect(dialog.getByRole('heading', { name: 'Tego produktu jeszcze nie znaleźliśmy' })).toHaveCount(0)
 })
 
-test('all 150 required product positions are available from the built-in licensed catalog', async ({ page }) => {
+test('150 catalogue types stay selectable and available Polish products use the local export', async ({ page }) => {
   let external = 0
   await page.route('https://world.openfoodfacts.org/**', (route) => { external++; return route.abort() })
   await page.goto(`${origin}/app/#/demo`)
