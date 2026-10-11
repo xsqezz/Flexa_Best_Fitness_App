@@ -38,14 +38,14 @@ export function manifest(hashRouter: boolean) {
 }
 
 /** Dodaje do builda manifest aplikacji i service worker z listą plików tej wersji (zmiana plików = nowa wersja). */
-export function pwa({ hashRouter }: { hashRouter: boolean }): Plugin {
+export function pwa({ hashRouter, catalogHash }: { hashRouter: boolean; catalogHash: string }): Plugin {
   return {
     name: 'flexa-pwa',
     apply: 'build',
     generateBundle(_options, bundle) {
       const files = Object.keys(bundle).filter((file) => file.startsWith('assets/') && !file.endsWith('.map')).sort()
-      const assets = [...files, 'favicon.svg', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png']
-      const version = createHash('sha256').update(files.join('\n')).digest('hex').slice(0, 12)
+      const assets = [...files, `data/polish-products.json?v=${catalogHash}`, 'favicon.svg', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png']
+      const version = createHash('sha256').update(assets.join('\n')).digest('hex').slice(0, 12)
       const template = readFileSync(join(import.meta.dirname, 'sw.js'), 'utf8')
       this.emitFile({ type: 'asset', fileName: 'manifest.webmanifest', source: `${JSON.stringify(manifest(hashRouter), null, 2)}\n` })
       this.emitFile({
