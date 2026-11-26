@@ -31,6 +31,10 @@ nie ogólnego klucza API Brevo:
 
 Nie zakładaj, że login SMTP to adres, którym logujesz się do panelu.
 Nie umieszczaj hasła SMTP w zmiennych `VITE_*`, GitHub Pages ani plikach Git.
+Lokalne pliki `.env*`, `.dev.vars*` i prywatne klucze są wykluczone z Git;
+wyjątkiem są wyłącznie puste lub przykładowe szablony. Nie używaj `git add -f`
+do publikowania sekretów. Jeśli sekret trafił do publicznego commita, unieważnij
+go u dostawcy: usunięcie z bieżącego pliku nie usuwa go z historii.
 
 Użyj osobnego klucza SMTP dla Flexa, zamiast klucza używanego przez inną
 aplikację. Sprawdź jego datę wygaśnięcia: Brevo wygasza klucze również po
