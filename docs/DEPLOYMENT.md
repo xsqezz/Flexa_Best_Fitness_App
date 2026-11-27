@@ -5,28 +5,24 @@ Projekt ma dwa niezależne frontendowe artefakty:
 (landing/dokumentacja i lokalne demo, GitHub Pages).
 Nie publikuj całej aplikacji z logowaniem i dziennikami na GitHub Pages.
 
-## Bieżące środowisko
+## Publiczny kod i prywatna konfiguracja
 
-Środowisko uruchomione 7 października 2026, rozszerzone o cele i cykle:
+Ta instrukcja opisuje odtworzenie wdrożenia, nie prywatne ustawienia produkcji.
+Hasła bazy, dane logowania SMTP, klucze administracyjne, kopie bazy i dane
+użytkowników przechowuj poza repozytorium oraz publicznymi artefaktami.
+Ustawienia konkretnego środowiska i kont dostawców pozostają w ich panelach
+lub bezpiecznym magazynie konfiguracji.
 
-- Aplikacja: `https://app.flexa.best` (także `https://flexa-click.pages.dev`), Cloudflare Pages z gałęzi `main`,
-  Node 24, `npm run build`, katalog wynikowy `app/dist`.
-- Osobny projekt Supabase `Flexa`: Frankfurt (`eu-central-1`), migracje
-  migracje w `supabase/migrations` aż do `202610100001_goal_cycles.sql`,
-  RLS i funkcje
-  `food-search` oraz `account-delete`.
-- Rejestracja e-mail z potwierdzeniem adresu, minimum hasła 10 znaków,
-  redirecty tylko do działającej aplikacji i jej `/reset-password`.
-- SMTP Brevo z osobnym kluczem Flexa oraz polskimi szablonami potwierdzenia
-  i odzyskiwania hasła. Konfiguracja pozostaje po stronie Supabase.
-- `FLEXA_APP_URL` kieruje landing GitHub Pages do aplikacji z kontami.
-  Osobne demo nadal zapisuje dane lokalnie.
+Publiczny kod, migracje, nazwy zmiennych i publiczny klucz Supabase nie
+zastępują sekretów ani autoryzacji. Bezpieczeństwo rekordów zapewniają RLS
+i weryfikacja użytkownika po stronie serwera; nie ukrywanie nazw tabel.
+Nie usuwaj informacji o administratorze, dostawcach i przetwarzaniu danych
+z polityki prywatności aplikacji.
 
-Brevo Free udostępnia 300 wiadomości dziennie na całe konto. Supabase ma
-ustawiony limit 300/h; nie jest to dodatkowa pula maili ani dzienny limit
-gwarantowany samej Flexa. Nie włączono nowego hooka ani limitu 50/dzień.
-Własne domeny `flexa.best` (landing) i `app.flexa.best` (aplikacja) są skonfigurowane:
-DNS w Cloudflare (strefa `flexa.best`, serwery nazw ustawione u rejestratora Spaceship).
+`.gitignore` wyklucza lokalne sekrety, pliki haseł PostgreSQL, kopie bazy,
+prywatne klucze i raporty testów. Nie obejmuje już śledzonych plików ani
+historii. Jeżeli sekret był publiczny, najpierw go unieważnij u dostawcy;
+usunięcie starej historii wymaga oddzielnego uzgodnienia.
 
 ## Lokalny start i demo
 
@@ -100,7 +96,8 @@ Copy-Item supabase\.env.example supabase\.env
 
 Uzupełnij plik `supabase\.env`:
 
-- `ALLOWED_ORIGINS`: dokładne originy, np. `https://app.flexa.best`. Produkcja: `https://flexa-click.pages.dev,https://app.flexa.best`.
+- `ALLOWED_ORIGINS`: dokładne originy Twojego wdrożenia, np. `https://app.example.org`.
+  Szablon zawiera tylko lokalny origin; nie dodawaj wildcardu `*`.
 - `OFF_CONTACT`: prawdziwy kontakt właściciela aplikacji do User-Agent.
 - `OFF_BASE_URL`: produkcja `https://world.openfoodfacts.org`; testy
   `https://world.openfoodfacts.net`. Staging ma udokumentowane Basic Auth off/off.
@@ -134,7 +131,7 @@ Workers & Pages > Create > Pages > Import existing Git repository.
 
 | Ustawienie | Wartość |
 | --- | --- |
-| Repo | xsqezz/flexa.click |
+| Repo | Twoje repozytorium Flexa |
 | Root directory | repozytorium (nie app) |
 | Production branch | main |
 | Build command | npm run build |
@@ -217,8 +214,8 @@ Zmienne repozytorium:
 
 - `FLEXA_APP_URL`: faktyczny origin działającej aplikacji Cloudflare; bez ścieżki.
   Bez niego CTA otwiera dołączone demo, nie fikcyjne działające konto.
-- `FLEXA_SITE_DOMAIN`: ustawione na `flexa.best`, **dopiero po potwierdzeniu
-  własności i poprawnym DNS**. Bez niego nie generujemy CNAME.
+- `FLEXA_SITE_DOMAIN`: opcjonalna domena własnego wdrożenia, **dopiero po
+  potwierdzeniu własności i poprawnym DNS**. Bez niego nie generujemy CNAME.
 
 ```powershell
 $env:FLEXA_APP_URL = 'https://app.flexa.best'

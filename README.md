@@ -2,12 +2,12 @@
 
 Darmowy, polski dziennik jedzenia, treningów i postępów. Niezależny projekt
 inspirowany funkcjonalnie Fitatu i Stravą — bez kopiowania ich kodu czy baz.
-Domena: [flexa.best](https://flexa.best/) (landing, GitHub Pages) i [app.flexa.best](https://app.flexa.best/) (aplikacja, Cloudflare Pages). Starsze adresy (`flexa-click.pages.dev`, `xsqezz.github.io/flexa.click`) nadal działają.
+Domena: [flexa.best](https://flexa.best/) (landing, GitHub Pages) i [app.flexa.best](https://app.flexa.best/) (aplikacja, Cloudflare Pages).
 
 Aplikacja w przeglądarce, bez instalowania APK: [Flexa](https://app.flexa.best/),
 [logowanie](https://app.flexa.best/login),
-[rejestracja](https://app.flexa.best/signup). Korzysta z osobnego projektu
-Supabase w regionie Frankfurt i z poczty weryfikacyjnej Brevo.
+[rejestracja](https://app.flexa.best/signup). Rejestracja wymaga potwierdzenia
+adresu e-mail. Informacja prywatności w aplikacji opisuje przetwarzanie danych.
 Strona `flexa.best` ma widoczny link „Zaloguj się” w nagłówku (także na telefonie)
 oraz przycisk „Otwórz w przeglądarce”. Linki buduje `FLEXA_APP_URL`; bez tej
 konfiguracji wskazują lokalne demo lub instrukcję, nie nieistniejące logowanie.
@@ -138,12 +138,15 @@ okno „Zaktualizuj”, pobranie, weryfikacja SHA-256 i podpisu, systemowe potwi
 `npm run android:release -- 1.0.1 --notes "Zmiana 1|Zmiana 2"`; APK buduje i podpisuje GitHub Actions.
 Szczegóły oraz ostrzeżenie o kopii zapasowej klucza podpisującego: [docs/ANDROID.md](docs/ANDROID.md).
 
-**Podłączone środowisko:** Cloudflare Pages, Supabase Auth/Postgres/Edge Functions
-i SMTP Brevo. Rejestracja wymaga potwierdzenia adresu, a hasło ma co najmniej
-10 znaków. Plan Brevo Free ma 300 maili dziennie, wspólnie dla aplikacji
-korzystających z tego konta; nie ma osobnego limitu 50 maili dla Flexa.
-W Supabase ustawiono 300 maili na godzinę, aby domyślny limit 2/h nie ograniczał
-wysyłki wcześniej niż Brevo. Limity per adres i IP nadal obowiązują.
+**Konta:** aplikacja korzysta z Supabase Auth/Postgres/Edge Functions i SMTP.
+Rejestracja wymaga potwierdzenia adresu, a hasło ma co najmniej 10 znaków.
+Limity poczty zależą od konfiguracji i planu wybranego dostawcy.
+
+**Publiczne repozytorium:** kod, migracje i instrukcje są publiczne; prywatne
+dane użytkowników, hasła bazy, SMTP i klucze administracyjne nie należą do Git.
+Rzeczywiste ustawienia środowiska przechowuj w panelach usług lub bezpiecznym
+magazynie sekretów. `.gitignore` chroni przed przypadkowym dodaniem lokalnych
+sekretów i kopii bazy, ale nie usuwa plików już opublikowanych w historii.
 
 **Odtworzenie wdrożenia:** własne projekty Supabase/Cloudflare, SMTP i DNS
 trzeba podłączyć zgodnie z instrukcją; sekrety nie są zapisane w repozytorium.
